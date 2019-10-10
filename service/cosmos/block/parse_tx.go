@@ -188,12 +188,22 @@ func (cosmos *Cosmos_Block) ParseCosmosTxModel(txBytes types.Tx, block *types.Bl
 			logger.String("err", err.Error()),
 			logger.String("Chain Block", cosmos.Name()))
 	}
-	msgStat, err := parseRawlog(result.Log)
-	if err != nil {
-		logger.Error("get parseRawlog err", logger.String("method", methodName),
-			logger.String("err", err.Error()),
-			logger.String("Chain Block", cosmos.Name()))
+	length_msgStat := 0
+	length_Tags := 0
+	var Tags []cmodel.Tag
+	var msgStat map[int]string
+	if result != nil {
+		msgStat, err = parseRawlog(result.Log)
+		if err != nil {
+			logger.Error("get parseRawlog err", logger.String("method", methodName),
+				logger.String("err", err.Error()),
+				logger.String("Chain Block", cosmos.Name()))
+		}
+		txdetail.Code = result.Code
+		Tags = parseTags(result)
 	}
+	length_msgStat = len(msgStat)
+	length_Tags = len(Tags)
 
 	fee := cutils.BuildFee(authTx.Fee)
 	txdetail.TxHash = cutils.BuildHex(txBytes.Hash())
@@ -202,11 +212,6 @@ func (cosmos *Cosmos_Block) ParseCosmosTxModel(txBytes types.Tx, block *types.Bl
 	txdetail.Fee = &fee
 	txdetail.Time = block.Time
 	txdetail.Status = status
-	txdetail.Code = result.Code
-	Tags := parseTags(result)
-
-	length_msgStat := len(msgStat)
-	length_Tags := len(Tags)
 
 	msgs := authTx.GetMsgs()
 	len_msgs := len(msgs)
