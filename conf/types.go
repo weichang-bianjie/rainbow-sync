@@ -9,24 +9,17 @@ import (
 )
 
 var (
-	SvrConf              *ServerConf
-	blockChainMonitorUrl = []string{"tcp://192.168.150.31:16657"}
-
-	workerNumCreateTask     = 1
-	workerNumExecuteTask    = 30
-	workerMaxSleepTime      = 2 * 60
-	blockNumPerWorkerHandle = 50
+	SvrConf               *ServerConf
+	blockChainMonitorUrl  = []string{"tcp://192.168.150.31:16657"}
+	chainBlockResetHeight = 0
 
 	initConnectionNum = 50  // fast init num of tendermint client pool
 	maxConnectionNum  = 100 // max size of tendermint client pool
 )
 
 type ServerConf struct {
-	NodeUrls                []string
-	WorkerNumCreateTask     int
-	WorkerNumExecuteTask    int
-	WorkerMaxSleepTime      int
-	BlockNumPerWorkerHandle int
+	NodeUrls              []string
+	ChainBlockResetHeight int64
 
 	MaxConnectionNum  int
 	InitConnectionNum int
@@ -38,10 +31,8 @@ const (
 	EnvNameDbPassWd   = "DB_PASSWD"
 	EnvNameDbDataBase = "DB_DATABASE"
 
-	EnvNameSerNetworkFullNodes     = "SER_BC_FULL_NODES"
-	EnvNameWorkerNumExecuteTask    = "WORKER_NUM_EXECUTE_TASK"
-	EnvNameWorkerMaxSleepTime      = "WORKER_MAX_SLEEP_TIME"
-	EnvNameBlockNumPerWorkerHandle = "BLOCK_NUM_PER_WORKER_HANDLE"
+	EnvNameSerNetworkFullNodes   = "SER_BC_FULL_NODES"
+	EnvNameChainBlockResetHeight = "CHAIN_BLOCK_RESET_HEIGHT"
 )
 
 // get value of env var
@@ -53,32 +44,16 @@ func init() {
 		blockChainMonitorUrl = strings.Split(nodeUrl, ",")
 	}
 
-	if v, found := os.LookupEnv(EnvNameWorkerNumExecuteTask); found {
-		workerNumExecuteTask, err = strconv.Atoi(v)
+	if v, found := os.LookupEnv(EnvNameChainBlockResetHeight); found {
+		chainBlockResetHeight, err = strconv.Atoi(v)
 		if err != nil {
-			logger.Fatal("Can't convert str to int", logger.String(EnvNameWorkerNumExecuteTask, v))
+			logger.Fatal("Can't convert str to int", logger.String(EnvNameChainBlockResetHeight, v))
 		}
 	}
 
-	if v, found := os.LookupEnv(EnvNameWorkerMaxSleepTime); found {
-		workerMaxSleepTime, err = strconv.Atoi(v)
-		if err != nil {
-			logger.Fatal("Can't convert str to int", logger.String(EnvNameWorkerMaxSleepTime, v))
-		}
-	}
-
-	if v, found := os.LookupEnv(EnvNameBlockNumPerWorkerHandle); found {
-		blockNumPerWorkerHandle, err = strconv.Atoi(v)
-		if err != nil {
-			logger.Fatal("Can't convert str to int", logger.String(EnvNameBlockNumPerWorkerHandle, v))
-		}
-	}
 	SvrConf = &ServerConf{
-		NodeUrls:                blockChainMonitorUrl,
-		WorkerNumCreateTask:     workerNumCreateTask,
-		WorkerNumExecuteTask:    workerNumExecuteTask,
-		WorkerMaxSleepTime:      workerMaxSleepTime,
-		BlockNumPerWorkerHandle: blockNumPerWorkerHandle,
+		NodeUrls:              blockChainMonitorUrl,
+		ChainBlockResetHeight: int64(chainBlockResetHeight),
 
 		MaxConnectionNum:  maxConnectionNum,
 		InitConnectionNum: initConnectionNum,

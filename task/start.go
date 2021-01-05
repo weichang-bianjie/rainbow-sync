@@ -45,9 +45,9 @@ func getHeightTask(chanHeight chan int64) {
 	} else {
 		inProcessBlock = maxHeight
 	}
-	//if server.SvrConf.ChainBlockResetHeight > 0 {
-	//	inProcessBlock = server.SvrConf.ChainBlockResetHeight
-	//}
+	if irisConf.SvrConf.ChainBlockResetHeight > 0 {
+		inProcessBlock = irisConf.SvrConf.ChainBlockResetHeight
+	}
 	for {
 		blockChainLatestHeight, err := getBlockChainLatestHeight()
 		if err != nil {

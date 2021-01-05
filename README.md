@@ -50,15 +50,5 @@ docker run --name rainbow-sync \&
 | DB_PASSWD | string | "" |db passwd  | password |
 | DB_DATABASE | string | "" |database name  | db_name |
 | SER_BC_FULL_NODES | string | tcp://localhost:26657 | iris full node rpc url | tcp://localhost:26657, tcp://127.0.0.2:26657 |
-| WORKER_NUM_EXECUTE_TASK | string | 30 | number of threads executing synchronization TX task | 30 |
-| WORKER_MAX_SLEEP_TIME | string | 120 | the maximum time (in seconds) that synchronization TX threads are allowed to be out of work | 120 |
-| BLOCK_NUM_PER_WORKER_HANDLE | string | 50 | number of blocks per sync TX task | 50 |
+| CHAIN_BLOCK_RESET_HEIGHT: `option` `string` block sync reset height; default `0` (example: `1`)
 
-- Remarks
-  - synchronizes  irishub data from  specify block height(such as:17908 current time:1576208532)
-  
-     At first,stop the rainbow-sync and create the task. Run:
-  ```bash
-     ﻿﻿db.sync_iris_task.insert({'start_height':NumberLong(17908),'end_height':NumberLong(0),'current_height':NumberLong(0),'status':'unhandled','last_update_time':NumberLong(1576208532)})
-  ```
-  Then,start the rainbow-sync.
