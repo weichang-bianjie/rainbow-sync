@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/irisnet/rainbow-sync/block"
 	irisConf "github.com/irisnet/rainbow-sync/conf"
-	"github.com/irisnet/rainbow-sync/cron"
 	"github.com/irisnet/rainbow-sync/lib/pool"
 	"github.com/irisnet/rainbow-sync/logger"
 	models "github.com/irisnet/rainbow-sync/model"
@@ -33,7 +32,7 @@ func Start() {
 
 	go SyncTx()
 
-	go new(cron.CronService).StartCronService()
+	//go new(cron.CronService).StartCronService()
 }
 
 func getHeightTask(chanHeight chan int64) {
