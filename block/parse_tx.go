@@ -17,9 +17,9 @@ import (
 	"time"
 )
 
-func SaveDocsWithTxn(blockDoc *model.Block, irisTxs []*model.Tx, taskDoc model.SyncTask) error {
+func SaveDocsWithTxn(blockDoc *model.Block, txDocs []*model.Tx, opsDoc ...txn.Op) error {
 	var (
-		ops, irisTxsOps []txn.Op
+		ops, txsOps []txn.Op
 	)
 
 	if blockDoc.Height == 0 {
@@ -27,39 +27,28 @@ func SaveDocsWithTxn(blockDoc *model.Block, irisTxs []*model.Tx, taskDoc model.S
 	}
 
 	blockOp := txn.Op{
-		C:      model.CollectionNameBlock,
+		C:      model.BlockModel.Name(),
 		Id:     bson.NewObjectId(),
 		Insert: blockDoc,
 	}
 
-	length_txs := len(irisTxs)
-	if length_txs > 0 {
-		irisTxsOps = make([]txn.Op, 0, length_txs)
-		for _, v := range irisTxs {
+	if length := len(txDocs); length > 0 {
+		for _, v := range txDocs {
 			op := txn.Op{
-				C:      model.CollectionNameIrisTx,
+				C:      model.TxModel.Name(),
 				Id:     bson.NewObjectId(),
 				Insert: v,
 			}
-			irisTxsOps = append(irisTxsOps, op)
+			txsOps = append(txsOps, op)
 		}
 	}
 
-	updateOp := txn.Op{
-		C:      model.CollectionNameSyncTask,
-		Id:     taskDoc.ID,
-		Assert: txn.DocExists,
-		Update: bson.M{
-			"$set": bson.M{
-				"current_height":   taskDoc.CurrentHeight,
-				"status":           taskDoc.Status,
-				"last_update_time": taskDoc.LastUpdateTime,
-			},
-		},
-	}
+	ops = append(ops, txsOps...)
+	ops = append(ops, blockOp)
 
-	ops = make([]txn.Op, 0, length_txs+2)
-	ops = append(append(ops, blockOp, updateOp), irisTxsOps...)
+	if len(opsDoc) > 0 {
+		ops = append(ops, opsDoc...)
+	}
 
 	if len(ops) > 0 {
 		err := db.Txn(ops)
@@ -70,7 +59,6 @@ func SaveDocsWithTxn(blockDoc *model.Block, irisTxs []*model.Tx, taskDoc model.S
 
 	return nil
 }
-
 func ParseBlock(b int64, client *pool.Client) (resBlock *model.Block, resTxs []*model.Tx, resErr error) {
 
 	defer func() {

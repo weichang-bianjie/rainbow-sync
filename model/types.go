@@ -3,12 +3,10 @@ package model
 import "github.com/irisnet/rainbow-sync/db"
 
 var (
-	SyncTaskModel SyncTask
-	BlockModel    Block
-	TxModel       Tx
+	BlockModel Block
+	TxModel    Tx
 
 	Collections = []db.Docs{
-		SyncTaskModel,
 		BlockModel,
 		TxModel,
 	}

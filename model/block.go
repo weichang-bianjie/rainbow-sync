@@ -1,9 +1,9 @@
 package model
 
 import (
+	"github.com/irisnet/rainbow-sync/db"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"github.com/irisnet/rainbow-sync/db"
 )
 
 const (
@@ -33,4 +33,22 @@ func (d Block) EnsureIndexes() {
 
 func (d Block) PkKvPair() map[string]interface{} {
 	return bson.M{"height": d.Height}
+}
+func (d Block) GetMaxHeight() (int64, error) {
+	cond := bson.M{
+		"height": bson.M{
+			"$gt": 0,
+		},
+	}
+	selecter := bson.M{
+		"height": 1,
+	}
+	var block Block
+	fn := func(c *mgo.Collection) error {
+		return c.Find(cond).Sort("-height").Select(selecter).One(&block)
+	}
+	if err := db.ExecCollection(d.Name(), fn); err != nil {
+		return 0, err
+	}
+	return block.Height, nil
 }
