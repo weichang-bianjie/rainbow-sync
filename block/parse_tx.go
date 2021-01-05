@@ -10,7 +10,6 @@ import (
 	"github.com/irisnet/rainbow-sync/logger"
 	"github.com/irisnet/rainbow-sync/model"
 	"github.com/irisnet/rainbow-sync/utils"
-	aTypes "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/types"
 	"golang.org/x/net/context"
 	"gopkg.in/mgo.v2/bson"
@@ -183,7 +182,9 @@ func ParseTx(txBytes types.Tx, block *types.Block, client *pool.Client) model.Tx
 		docTx.Log = res.TxResult.Log
 
 	}
-	docTx.Events = parseEvents(res.TxResult.Events)
+	if res.TxResult.Code == 0 {
+		docTx.Events = parseEvents(res.TxResult.Log)
+	}
 
 	msgs := authTx.GetMsgs()
 	if len(msgs) == 0 {
@@ -221,25 +222,11 @@ func BuildFee(fee sdk.Coins, gas uint64) *model.Fee {
 	}
 }
 
-func parseEvents(events []aTypes.Event) []model.Event {
+func parseEvents(log string) []model.Event {
 	var eventDocs []model.Event
-	if len(events) > 0 {
-		for _, e := range events {
-			var kvPairDocs []model.KvPair
-			if len(e.Attributes) > 0 {
-				for _, v := range e.Attributes {
-					kvPairDocs = append(kvPairDocs, model.KvPair{
-						Key:   string(v.Key),
-						Value: string(v.Value),
-					})
-				}
-			}
-			eventDocs = append(eventDocs, model.Event{
-				Type:       e.Type,
-				Attributes: kvPairDocs,
-			})
-		}
-	}
+	if log != "" {
+		utils.UnMarshalJsonIgnoreErr(log, &eventDocs)
 
+	}
 	return eventDocs
 }
