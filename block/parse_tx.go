@@ -149,6 +149,7 @@ func ParseTx(txBytes types.Tx, block *types.Block, client *pool.Client) (model.T
 		docFailTx model.ErrTx
 		actualFee msgsdktypes.Coin
 	)
+	txHash := utils.BuildHex(txBytes.Hash())
 	authTx, err := codec.GetSigningTx(txBytes)
 	if err != nil {
 		docFailTx.Height = block.Height
@@ -165,7 +166,6 @@ func ParseTx(txBytes types.Tx, block *types.Block, client *pool.Client) (model.T
 	fee := msgsdktypes.BuildFee(authTx.GetFee(), authTx.GetGas())
 	memo := authTx.GetMemo()
 	height := block.Height
-	txHash := utils.BuildHex(txBytes.Hash())
 	ctx := context.Background()
 	res, err := client.Tx(ctx, txBytes.Hash(), false)
 	if err != nil {
