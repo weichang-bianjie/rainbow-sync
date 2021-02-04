@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/irisnet/rainbow-sync/conf"
 	model "github.com/irisnet/rainbow-sync/db"
-	"github.com/irisnet/rainbow-sync/logger"
+	"github.com/irisnet/rainbow-sync/lib/logger"
 	imodel "github.com/irisnet/rainbow-sync/model"
 	"gopkg.in/mgo.v2/bson"
 	"gopkg.in/mgo.v2/txn"
@@ -46,7 +46,6 @@ func (s *TaskIrisService) createTask(blockNumPerWorkerHandle int64, chanLimit ch
 		}
 		<-chanLimit
 	}()
-
 	// check valid follow task if exist
 	// status of valid follow task is unhandled or underway
 	validFollowTasks, err := s.syncIrisModel.QueryAll(

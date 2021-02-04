@@ -6,8 +6,8 @@ import (
 	"github.com/irisnet/rainbow-sync/block"
 	"github.com/irisnet/rainbow-sync/conf"
 	model "github.com/irisnet/rainbow-sync/db"
+	"github.com/irisnet/rainbow-sync/lib/logger"
 	"github.com/irisnet/rainbow-sync/lib/pool"
-	"github.com/irisnet/rainbow-sync/logger"
 	imodel "github.com/irisnet/rainbow-sync/model"
 	"github.com/irisnet/rainbow-sync/utils"
 	"gopkg.in/mgo.v2"
@@ -29,10 +29,6 @@ func (s *TaskIrisService) StartExecuteTask() {
 
 	// buffer channel to limit goroutine num
 	chanLimit := make(chan bool, conf.SvrConf.WorkerNumExecuteTask)
-	pool.Init(conf.SvrConf.NodeUrls, conf.SvrConf.MaxConnectionNum, conf.SvrConf.InitConnectionNum)
-	defer func() {
-		pool.ClosePool()
-	}()
 
 	for {
 		chanLimit <- true
@@ -64,7 +60,6 @@ func (s *TaskIrisService) executeTask(blockNumPerWorkerHandle, maxWorkerSleepTim
 		<-chanLimit
 		client.Release()
 	}()
-
 	// check whether exist executable task
 	// status = unhandled or
 	// status = underway and now - lastUpdateTime > confTime

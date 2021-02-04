@@ -2,13 +2,11 @@ package block
 
 import (
 	"encoding/json"
-	irisConf "github.com/irisnet/rainbow-sync/conf"
 	"github.com/irisnet/rainbow-sync/lib/pool"
 	"testing"
 )
 
 func TestIris_Block_ParseIrisTx(t *testing.T) {
-	pool.Init(irisConf.SvrConf.NodeUrls, irisConf.SvrConf.MaxConnectionNum, irisConf.SvrConf.InitConnectionNum)
 	client := pool.GetClient()
 	defer func() {
 		client.Release()
