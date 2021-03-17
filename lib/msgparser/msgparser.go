@@ -1,6 +1,8 @@
 package msgparser
 
-import "github.com/kaifei-bianjie/msg-parser"
+import (
+	msg_parser "github.com/weichang-bianjie/msg-sdk"
+)
 
 var (
 	MsgClient msg_parser.MsgClient

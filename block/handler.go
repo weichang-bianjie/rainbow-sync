@@ -2,8 +2,8 @@ package block
 
 import (
 	"github.com/irisnet/rainbow-sync/lib/msgparser"
-	. "github.com/kaifei-bianjie/msg-parser/modules"
-	"github.com/kaifei-bianjie/msg-parser/types"
+	. "github.com/weichang-bianjie/msg-sdk/modules"
+	"github.com/weichang-bianjie/msg-sdk/types"
 )
 
 func HandleTxMsg(v types.SdkMsg) MsgDocInfo {

@@ -2,7 +2,7 @@ package block
 
 import (
 	"github.com/irisnet/rainbow-sync/conf"
-	"github.com/kaifei-bianjie/msg-parser/codec"
+	"github.com/weichang-bianjie/msg-sdk/codec"
 )
 
 var (
